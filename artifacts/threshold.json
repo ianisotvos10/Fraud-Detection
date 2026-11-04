@@ -1,0 +1,5 @@
+{
+  "threshold": 0.9860929846763611,
+  "run_id": "c75c7d041e2845bd8b058bbe37854da0",
+  "criteriu": "recall maxim cu precizie >= 0.90 (ales pe fereastra recenta, de reconfirmat cu date noi)"
+}
