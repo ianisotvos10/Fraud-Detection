@@ -1,38 +1,44 @@
-# MLOps Credit Card Fraud Detection Pipeline
+# 💳 MLOps: Credit Card Fraud Detection Pipeline
 
-Un pipeline complet de MLOps pentru detectarea fraudelor cu carduri de credit, construit ca proiect de portofoliu. Proiectul acopera intregul flux: de la split-ul temporal al datelor (pentru a evita data leakage-ul), antrenarea unui model XGBoost cu hiperparametri optimizati, logarea experimentelor in MLflow, pana la servirea modelului printr-un API de productie cu FastAPI.
+Salut! Acesta este un proiect de portofoliu prin care am vrut sa depasesc stadiul de "inca un Jupyter Notebook" si sa construiesc un sistem complet de Machine Learning pregatit pentru productie. 
 
----
+Proiectul nu se concentreaza doar pe antrenarea unui model, ci pe intregul pipeline MLOps: prevenirea data leakage-ului, optimizarea deciziilor pentru un mediu de business (threshold tuning), logarea experimentelor si servirea modelului printr-un API.
 
-## 1. Structura Proiectului & Dataset
-
-Datasetul folosit este cel de pe Kaggle (`Credit Card Fraud Detection`). Deoarece datele sunt voluminoase si sensibile, acestea, alaturi de baza de date MLflow, sunt excluse din controlul versiunilor prin `.gitignore`.
-
-* **Date brute:** Descarca `creditcard.csv` de pe Kaggle si plaseaza-l in folderul `data/raw/`.
-* **Organizare cod:**
-  * `src/split.py` - Realizeaza split-ul cronologic strict.
-  * `src/train.py` - Antreneaza modelul XGBoost si logheaza totul in MLflow.
-  * `src/evaluate.py` - Analizeaza si optimizeaza pragul de decizie (threshold tuning).
-  * `api/main.py` - Microserviciul FastAPI pentru inferenta in timp real.
+## 🛠️ Tech Stack
+* **Machine Learning:** Python, XGBoost, scikit-learn, Pandas
+* **MLOps & Tracking:** MLflow (cu backend SQLite local)
+* **Serving & Backend:** FastAPI, Uvicorn, Pydantic
+* **Deployment:** Docker
 
 ---
 
-## 2. Arhitectura & Decizii de Proiectare
+## 🧠 Decizii de Arhitectura (Cum am evitat capcanele clasice)
 
-Pentru a evita capcanele clasice din machine learning, am implementat urmatoarele reguli:
-* **Split Temporal Strict:** Pentru ca datele au o componenta temporala (`Time`), am sortat tranzacțiile cronologic inainte de impartire (70% train, 15% validare, 15% test). Astfel, modelul nu "vede" niciodata viitorul in momentul antrenarii.
-* **Metrici pentru Clase Dezechilibrate:** Evitam acuratectea (care e inselatoare cand 99.8% din tranzactii sunt sigure) si ne concentram pe **PR-AUC**, **Precision**, **Recall** si **Matricea de Confuzie**.
-* **Optimizarea Pragului (Threshold Tuning):** Folosirea pragului implicit de 0.5 genera prea multe alarme false (351 FP pe validare). Testand mai multe praguri, am stabilit ca o valoare de **0.80 / 0.92** ofera cel mai bun echilibru, reducand drastic alarmele false fara sa ratam fraudele majore.
-* **Protectia Setului de Test:** Setul de test a fost utilizat o singura data, la final, pentru evaluarea obiectiva a performantei.
+Cand lucrezi cu date tabulare financiare puternic dezechilibrate, e usor sa obtii o acuratete de 99.9% care in realitate e inutila. Iata cum am abordat problema:
+
+1. **Zero Data Leakage (Split Temporal strict):** Nu am folosit un split random. Am sortat tranzactiile cronologic si am taiat setul de date in Train (70%), Validation (15%) si Test (15%). Astfel, modelul nu a "vazut" informatii din viitor la antrenare.
+2. **Optimizare pentru Business (Threshold Tuning):** La un prag standard de 0.5, modelul prindea fraudele, dar bloca eronat 351 de tranzactii legitime (False Positives). Am calibrat pragul de decizie la **0.80**, reducand alarmele false la doar **10**, sacrificand doar un procent infim din fraudele detectate.
+3. **Metrici corecte:** Am evaluat performanta folosind **PR-AUC**, **F1-Score** si matricea de confuzie, ignorand complet acuratetea.
+4. **Experiment Tracking:** Orice rulare a modelului si orice hiperparametru modificat (ex: `learning_rate`, `max_depth`) sunt salvate automat si versionate in MLflow.
 
 ---
 
-## 3. Ghid de Rulare (Quickstart)
+## 📂 Structura si Dataset
 
-### Rulare Locala
-1. Activeaza mediul virtual si instaleaza dependentele:
-   ```bash
-   python -m venv venv
-   # Pe Windows:
-   venv\Scripts\activate
-   pip install -r requirements.txt
+Datasetul folosit este [Credit Card Fraud Detection de pe Kaggle](https://www.kaggle.com/datasets/mlg-ulb/creditcardfile). 
+*Nota: Fisierele `.csv` masive, impreuna cu `mlruns/` si baza de date `mlflow.db`, sunt excluse din repo via `.gitignore` pentru a pastra istoricul curat.*
+
+```text
+fraud-detection-mlops/
+├── api/
+│   └── main.py          # Microserviciul FastAPI
+├── data/
+│   ├── processed/       # Train/Val/Test split (generate local)
+│   └── raw/             # Aici pui creditcard.csv descarcat manual
+├── src/
+│   ├── split.py         # Logica de impartire cronologica
+│   ├── train.py         # Antrenare XGBoost & MLflow logging
+│   └── evaluate.py      # Analiza pragurilor de decizie
+├── .gitignore
+├── requirements.txt
+└── README.md
