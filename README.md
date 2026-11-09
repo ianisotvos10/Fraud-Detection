@@ -1,4 +1,4 @@
-#MLOps: Credit Card Fraud Detection Pipeline
+#  MLOps: Credit Card Fraud Detection Pipeline
 
 Obiectivul principal nu a fost doar gasirea unui algoritm cu o acuratete mare, ci construirea unui pipeline end-to-end capabil sa rezolve o problema din lumea reala: detectarea fraudelor bancare in conditii de dezechilibru extrem al datelor. 
 
@@ -25,7 +25,7 @@ Cand lucrezi cu date tabulare financiare unde fraudele reprezinta sub 0.2% din t
 
 ---
 
-##Tech Stack
+##  Tech Stack
 * **Machine Learning:** Python, XGBoost, scikit-learn, Pandas
 * **MLOps & Tracking:** MLflow (cu backend SQLite local)
 * **Serving & Backend:** FastAPI, Uvicorn, Pydantic
@@ -33,7 +33,7 @@ Cand lucrezi cu date tabulare financiare unde fraudele reprezinta sub 0.2% din t
 
 ---
 
-##Structura si Dataset
+##  Structura si Dataset
 
 Datasetul folosit este [Credit Card Fraud Detection de pe Kaggle](https://www.kaggle.com/datasets/mlg-ulb/creditcardfile). 
 *Nota: Fisierele `.csv` masive, impreuna cu `mlruns/` si baza de date `mlflow.db`, sunt excluse din repo via `.gitignore` pentru a pastra istoricul curat.*
